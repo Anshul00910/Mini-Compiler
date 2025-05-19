@@ -4,854 +4,160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compiler Design Project</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --primary-color: #3a5683;
-            --secondary-color: #f0f4f8;
-            --accent-color: #7d98b3;
-            --text-color: #333;
-            --editor-bg: #282c34;
-            --editor-text: #abb2bf;
-            --editor-line: #636d83;
-            --button-hover: #2c4266;
-            --modal-bg: rgba(0, 0, 0, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        header {
+        /* Style for welcome screen */
+        .welcome-screen {
             text-align: center;
-            margin-bottom: 30px;
+            padding: 50px 20px;
+            background: linear-gradient(to right, #dfe9f3, #ffffff);
         }
 
-        h1 {
-            color: var(--primary-color);
-            font-size: 2.2rem;
-            margin-bottom: 10px;
+        .welcome-title {
+            font-size: 3rem;
+            color: #333;
         }
 
-        .subtitle {
-            color: var(--accent-color);
-            font-size: 1.1rem;
-            font-weight: 400;
+        .welcome-description {
+            font-size: 1.2rem;
+            margin: 20px 0 40px;
+            color: #444;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-
-        @media (min-width: 768px) {
-            .container {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .editor-section {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
-        .editor-header {
+        .phase-cards {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
         }
 
-        .editor-title {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-        }
-
-        .file-upload {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .file-upload label {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-
-        .file-upload label:hover {
-            background-color: var(--button-hover);
-        }
-
-        .file-upload input {
-            display: none;
-        }
-
-        .file-name {
-            font-size: 0.9rem;
-            color: var(--accent-color);
-        }
-
-        .code-editor {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            margin-bottom: 15px;
-        }
-
-        .line-numbers {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40px;
-            height: 100%;
-            background-color: #2d3139;
-            color: var(--editor-line);
-            padding: 10px 5px;
-            text-align: right;
-            font-family: monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            user-select: none;
-            overflow: hidden;
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-        }
-
-        .code-textarea {
-            position: absolute;
-            top: 0;
-            left: 40px;
-            width: calc(100% - 40px);
-            height: 100%;
-            background-color: var(--editor-bg);
-            color: var(--editor-text);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            padding: 10px;
-            border: none;
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-            resize: none;
-            outline: none;
-            tab-size: 4;
-        }
-
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .compiler-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 0;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-
-        .compiler-button:hover {
-            background-color: var(--button-hover);
-        }
-
-        .compiler-button:active {
-            transform: scale(0.98);
-        }
-
-        .output-section {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-
-        .output-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .output-title {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-        }
-
-        .phase-indicator {
-            padding: 5px 10px;
-            background-color: var(--accent-color);
-            color: white;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-
-        .output-content {
-            background-color: #f8f9fa;
+        .phase-card {
+            background-color: #f9f9f9;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-            height: 350px;
-            overflow-y: auto;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 250px;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .loader {
-            display: none;
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid var(--primary-color);
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        .phase-card h3 {
+            margin-top: 0;
+            color: #0077cc;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--modal-bg);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 25px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 700px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .close {
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: var(--accent-color);
-        }
-
-        .close:hover {
-            color: var(--primary-color);
-        }
-
-        .modal-title {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-
-        .modal-output {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-            max-height: 50vh;
-            overflow-y: auto;
-        }
-
-        /* Footer styles */
-        footer {
-            text-align: center;
+        .get-started-btn {
             margin-top: 40px;
-            color: var(--accent-color);
-            font-size: 0.9rem;
+            padding: 12px 25px;
+            font-size: 1rem;
+            background-color: #0077cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        .status-message {
-            color: var(--primary-color);
-            margin-top: 10px;
-            text-align: center;
-            font-size: 0.9rem;
+        .get-started-btn:hover {
+            background-color: #005fa3;
+        }
+
+        /* Hide the main app initially */
+        .main-app {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Compiler Design Project</h1>
-        <p class="subtitle">Interactive Compiler Phases Demonstration</p>
-    </header>
 
-    <div class="container">
-        <div class="editor-section">
-            <div class="editor-header">
-                <h2 class="editor-title">Code Editor</h2>
-                <div class="file-upload">
-                    <label for="file-input">Upload .cpp</label>
-                    <input type="file" id="file-input" accept=".cpp,.c">
-                    <span class="file-name" id="file-name">No file selected</span>
+    <!-- Welcome Page -->
+    <div class="welcome-screen" id="welcome-screen">
+        <h1 class="welcome-title">Welcome to the Compiler Design Project</h1>
+        <p class="welcome-description">Explore how source code is processed through various phases of a compiler!</p>
+
+        <div class="phase-cards">
+            <div class="phase-card">
+                <h3>1. Lexical Analysis</h3>
+                <p>Breaks input code into tokens like keywords, identifiers, operators, etc.</p>
+            </div>
+            <div class="phase-card">
+                <h3>2. Syntax Analysis</h3>
+                <p>Checks code structure against grammar rules using parse trees.</p>
+            </div>
+            <div class="phase-card">
+                <h3>3. Semantic Analysis</h3>
+                <p>Ensures meaningful logic like type compatibility and declared variables.</p>
+            </div>
+            <div class="phase-card">
+                <h3>4. Intermediate Code</h3>
+                <p>Generates simplified low-level code using temporary variables (TAC).</p>
+            </div>
+        </div>
+
+        <button class="get-started-btn" onclick="startProject()">Explore Compiler Phases</button>
+    </div>
+
+    <!-- Main Compiler Interface -->
+    <div class="main-app" id="main-app">
+        <header>
+            <h1>Compiler Design Project</h1>
+            <p class="subtitle">Interactive Compiler Phases Demonstration</p>
+        </header>
+
+        <div class="container">
+            <div class="editor-section">
+                <div class="editor-header">
+                    <h2 class="editor-title">Code Editor</h2>
+                    <div class="file-upload">
+                        <label for="file-input">Upload .cpp</label>
+                        <input type="file" id="file-input" accept=".cpp,.c">
+                        <span class="file-name" id="file-name">No file selected</span>
+                    </div>
                 </div>
+                <div class="code-editor">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <textarea class="code-textarea" id="code-textarea" spellcheck="false" placeholder="// Enter your C/C++ code here..."></textarea>
+                </div>
+                <div class="button-group">
+                    <button class="compiler-button" data-phase="lexical">Lexical Analysis</button>
+                    <button class="compiler-button" data-phase="syntax">Syntax Analysis</button>
+                    <button class="compiler-button" data-phase="semantic">Semantic Analysis</button>
+                    <button class="compiler-button" data-phase="intermediate">Intermediate Code</button>
+                </div>
+                <div class="status-message" id="status-message"></div>
             </div>
-            <div class="code-editor">
-                <div class="line-numbers" id="line-numbers"></div>
-                <textarea class="code-textarea" id="code-textarea" spellcheck="false" placeholder="// Enter your C/C++ code here..."></textarea>
+
+            <div class="output-section">
+                <div class="output-header">
+                    <h2 class="output-title">Compiler Output</h2>
+                    <div class="phase-indicator" id="phase-indicator">Ready</div>
+                </div>
+                <div class="loader" id="loader"></div>
+                <div class="output-content" id="output-content">Output will appear here after analysis...</div>
             </div>
-            <div class="button-group">
-                <button class="compiler-button" data-phase="lexical">Lexical Analysis</button>
-                <button class="compiler-button" data-phase="syntax">Syntax Analysis</button>
-                <button class="compiler-button" data-phase="semantic">Semantic Analysis</button>
-                <button class="compiler-button" data-phase="intermediate">Intermediate Code</button>
-            </div>
-            <div class="status-message" id="status-message"></div>
         </div>
 
-        <div class="output-section">
-            <div class="output-header">
-                <h2 class="output-title">Compiler Output</h2>
-                <div class="phase-indicator" id="phase-indicator">Ready</div>
+        <!-- Modal for output -->
+        <div id="output-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="close-modal">&times;</span>
+                <h2 class="modal-title" id="modal-title">Output</h2>
+                <div class="modal-output" id="modal-output"></div>
             </div>
-            <div class="loader" id="loader"></div>
-            <div class="output-content" id="output-content">Output will appear here after analysis...</div>
         </div>
+
+        <footer>
+            <p>&copy; 2025 Compiler Design Project</p>
+        </footer>
     </div>
 
-    <!-- Modal for full-screen output -->
-    <div id="output-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="close-modal">&times;</span>
-            <h2 class="modal-title" id="modal-title">Output</h2>
-            <div class="modal-output" id="modal-output"></div>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2025 Compiler Design Project</p>
-    </footer>
-
+    <!-- JS to toggle welcome -> compiler app -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const codeTextarea = document.getElementById('code-textarea');
-            const lineNumbers = document.getElementById('line-numbers');
-            const fileInput = document.getElementById('file-input');
-            const fileName = document.getElementById('file-name');
-            const outputContent = document.getElementById('output-content');
-            const phaseIndicator = document.getElementById('phase-indicator');
-            const loader = document.getElementById('loader');
-            const statusMessage = document.getElementById('status-message');
-            const compilerButtons = document.querySelectorAll('.compiler-button');
-            const modal = document.getElementById('output-modal');
-            const modalOutput = document.getElementById('modal-output');
-            const modalTitle = document.getElementById('modal-title');
-            const closeModal = document.getElementById('close-modal');
-
-            // Sample initial code
-            const initialCode = `// Sample C++ code
-#include <iostream>
-
-int main() {
-    int x = 10;
-    int y = 20;
-    
-    std::cout << "Sum: " << x + y << std::endl;
-    
-    return 0;
-}`;
-            codeTextarea.value = initialCode;
-
-            // Update line numbers
-            function updateLineNumbers() {
-                const lines = codeTextarea.value.split('\n');
-                lineNumbers.innerHTML = lines.map((_, i) => i + 1).join('<br>');
-            }
-
-            // Initialize line numbers
-            updateLineNumbers();
-
-            // Event listeners
-            codeTextarea.addEventListener('input', updateLineNumbers);
-            codeTextarea.addEventListener('scroll', function() {
-                lineNumbers.scrollTop = codeTextarea.scrollTop;
-            });
-
-            codeTextarea.addEventListener('keydown', function(e) {
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const start = this.selectionStart;
-                    const end = this.selectionEnd;
-                    
-                    this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-                    this.selectionStart = this.selectionEnd = start + 4;
-                    updateLineNumbers();
-                }
-            });
-
-            // Handle file uploads
-            fileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    fileName.textContent = file.name;
-                    
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        codeTextarea.value = e.target.result;
-                        updateLineNumbers();
-                    };
-                    reader.readAsText(file);
-                }
-            });
-
-            // Handle compiler button clicks
-            compilerButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const phase = this.getAttribute('data-phase');
-                    processCode(phase);
-                });
-            });
-
-            // Close modal when clicking the X or outside the modal
-            closeModal.addEventListener('click', function() {
-                modal.style.display = 'none';
-            });
-
-            window.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-
-            // Process code based on selected phase
-            function processCode(phase) {
-                const code = codeTextarea.value;
-                if (!code.trim()) {
-                    statusMessage.textContent = 'Please enter some code first.';
-                    return;
-                }
-
-                // Reset messages and show loader
-                statusMessage.textContent = '';
-                loader.style.display = 'block';
-                
-                // Update phase indicator
-                let phaseText = '';
-                switch (phase) {
-                    case 'lexical':
-                        phaseText = 'Lexical Analysis';
-                        break;
-                    case 'syntax':
-                        phaseText = 'Syntax Analysis';
-                        break;
-                    case 'semantic':
-                        phaseText = 'Semantic Analysis';
-                        break;
-                    case 'intermediate':
-                        phaseText = 'Intermediate Code';
-                        break;
-                }
-                phaseIndicator.textContent = phaseText;
-
-                // Simulated backend call (replace with actual fetch in production)
-                setTimeout(() => {
-                    simulateBackendResponse(phase, code)
-                        .then(result => {
-                            loader.style.display = 'none';
-                            outputContent.textContent = result;
-                            
-                            // Also update modal content
-                            modalTitle.textContent = phaseText + ' Output';
-                            modalOutput.textContent = result;
-                            
-                            // For demonstration purposes, show the modal for intermediate code
-                            if (phase === 'intermediate') {
-                                modal.style.display = 'block';
-                            }
-                        })
-                        .catch(error => {
-                            loader.style.display = 'none';
-                            outputContent.textContent = 'Error: ' + error.message;
-                            statusMessage.textContent = 'An error occurred during processing.';
-                        });
-                }, 1000); // Simulated 1 second delay
-            }
-
-            // This function simulates backend responses
-            // In production, replace with actual fetch calls to your backend
-            function simulateBackendResponse(phase, code) {
-                return new Promise((resolve, reject) => {
-                    try {
-                        let result = '';
-                        switch (phase) {
-                            case 'lexical':
-                                result = simulateLexicalAnalysis(code);
-                                break;
-                            case 'syntax':
-                                result = simulateSyntaxAnalysis(code);
-                                break;
-                            case 'semantic':
-                                result = simulateSemanticAnalysis(code);
-                                break;
-                            case 'intermediate':
-                                result = simulateIntermediateCode(code);
-                                break;
-                        }
-                        resolve(result);
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
-
-                // In production, use something like:
-                // return fetch(`/run-${phase}`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify({ code })
-                // })
-                // .then(response => {
-                //     if (!response.ok) {
-                //         throw new Error('Network response was not ok');
-                //     }
-                //     return response.text();
-                // });
-            }
-
-            // These functions simulate the compiler phases
-            // Replace these with your actual backend calls
-            function simulateLexicalAnalysis(code) {
-                // Simple tokenization for demonstration
-                const tokens = [];
-                const keywords = ['int', 'float', 'char', 'double', 'if', 'else', 'while', 'for', 'return', 'include', 'iostream', 'std', 'cout', 'endl'];
-                const operators = ['+', '-', '*', '/', '=', '==', '<', '>', '<=', '>=', '<<', '>>'];
-                
-                // Very simplified tokenizer
-                const tokenPattern = /([a-zA-Z_][a-zA-Z0-9_]*|\d+|\+|-|\*|\/|=|==|<|>|<=|>=|<<|>>|{|}|\(|\)|;|,|\.|#|"|'|:|&|\[|\])/g;
-                const matches = code.match(tokenPattern) || [];
-                
-                for (const match of matches) {
-                    let type = 'IDENTIFIER';
-                    
-                    if (keywords.includes(match)) {
-                        type = 'KEYWORD';
-                    } else if (operators.includes(match)) {
-                        type = 'OPERATOR';
-                    } else if (!isNaN(match)) {
-                        type = 'NUMBER';
-                    } else if (match === '{' || match === '}') {
-                        type = 'BRACE';
-                    } else if (match === '(' || match === ')') {
-                        type = 'PARENTHESIS';
-                    } else if (match === ';') {
-                        type = 'SEMICOLON';
-                    } else if (match === '#') {
-                        type = 'PREPROCESSOR';
-                    }
-                    
-                    tokens.push({ token: match, type });
-                }
-                
-                return tokens.map((t, i) => `${i+1}. ${t.token.padEnd(15)} - ${t.type}`).join('\n');
-            }
-
-            function simulateSyntaxAnalysis(code) {
-                // Simple syntax validation for demonstration
-                let result = 'Syntax Analysis Results:\n\n';
-                
-                // Check for balanced braces
-                let braceCount = 0;
-                let parenCount = 0;
-                
-                for (const char of code) {
-                    if (char === '{') braceCount++;
-                    if (char === '}') braceCount--;
-                    if (char === '(') parenCount++;
-                    if (char === ')') parenCount--;
-                    
-                    if (braceCount < 0) {
-                        return result + 'Error: Unexpected closing brace }';
-                    }
-                    if (parenCount < 0) {
-                        return result + 'Error: Unexpected closing parenthesis )';
-                    }
-                }
-                
-                if (braceCount > 0) {
-                    return result + `Error: Missing ${braceCount} closing brace(s) }`;
-                }
-                if (parenCount > 0) {
-                    return result + `Error: Missing ${parenCount} closing parenthesis`;
-                }
-                
-                // Check for semicolons
-                const lines = code.split('\n');
-                let errorLines = [];
-                
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (line && 
-                        !line.endsWith(';') && 
-                        !line.endsWith('{') && 
-                        !line.endsWith('}') && 
-                        !line.startsWith('#') &&
-                        !line.endsWith(':') &&
-                        !line.startsWith('//')) {
-                        
-                        // Check for function declarations or loop conditions
-                        if (!line.includes('(') || (line.includes('(') && line.includes(')') && !line.includes('if') && !line.includes('for') && !line.includes('while'))) {
-                            errorLines.push(i+1);
-                        }
-                    }
-                }
-                
-                if (errorLines.length > 0) {
-                    return result + `Potential missing semicolons on lines: ${errorLines.join(', ')}`;
-                }
-                
-                // Build a simple parse tree
-                result += 'Parse Tree:\n';
-                result += '- Program\n';
-                
-                if (code.includes('#include')) {
-                    result += '  |- Preprocessor Directives\n';
-                }
-                
-                if (code.includes('int main')) {
-                    result += '  |- Main Function\n';
-                    result += '     |- Function Header\n';
-                    result += '     |- Function Body\n';
-                    
-                    if (code.includes('int') || code.includes('float') || code.includes('char') || code.includes('double')) {
-                        result += '        |- Variable Declarations\n';
-                    }
-                    
-                    if (code.includes('cout')) {
-                        result += '        |- Output Statements\n';
-                    }
-                    
-                    if (code.includes('return')) {
-                        result += '        |- Return Statement\n';
-                    }
-                }
-                
-                result += '\nSyntax analysis completed successfully.';
-                return result;
-            }
-
-            function simulateSemanticAnalysis(code) {
-                // Simple semantic analysis for demonstration
-                let result = 'Semantic Analysis Results:\n\n';
-                
-                // Symbol table
-                result += 'Symbol Table:\n';
-                result += '---------------\n';
-                result += 'Name      Type      Scope     Line\n';
-                result += '------------------------------\n';
-                
-                const matches = code.match(/\b(int|float|double|char)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:=\s*([^;]+))?;/g) || [];
-                const declarations = matches.map(match => {
-                    const parts = match.match(/\b(int|float|double|char)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:=\s*([^;]+))?;/);
-                    if (parts) {
-                        return {
-                            type: parts[1],
-                            name: parts[2],
-                            value: parts[3] || 'undefined',
-                            line: code.substr(0, code.indexOf(match)).split('\n').length
-                        };
-                    }
-                    return null;
-                }).filter(Boolean);
-                
-                // Add declarations to symbol table
-                declarations.forEach(decl => {
-                    result += `${decl.name.padEnd(10)} ${decl.type.padEnd(10)} global    ${decl.line}\n`;
-                });
-                
-                result += '\nType Checking:\n';
-                result += '---------------\n';
-                
-                // Simple type checking for assignments
-                declarations.forEach(decl => {
-                    if (decl.value !== 'undefined') {
-                        let valueType = 'unknown';
-                        
-                        if (!isNaN(decl.value) && !decl.value.includes('.')) {
-                            valueType = 'int';
-                        } else if (!isNaN(decl.value) && decl.value.includes('.')) {
-                            valueType = 'float';
-                        } else if (decl.value.startsWith('"') && decl.value.endsWith('"')) {
-                            valueType = 'string';
-                        } else if (decl.value.startsWith("'") && decl.value.endsWith("'") && decl.value.length === 3) {
-                            valueType = 'char';
-                        }
-                        
-                        if (decl.type === 'int' && valueType !== 'int') {
-                            result += `Warning: Line ${decl.line} - Assigning ${valueType} to int variable '${decl.name}'\n`;
-                        } else if (decl.type === 'float' && valueType !== 'float' && valueType !== 'int') {
-                            result += `Warning: Line ${decl.line} - Assigning ${valueType} to float variable '${decl.name}'\n`;
-                        } else if (decl.type === 'char' && valueType !== 'char') {
-                            result += `Warning: Line ${decl.line} - Assigning ${valueType} to char variable '${decl.name}'\n`;
-                        }
-                    }
-                });
-                
-                // Check for undefined variables
-                const usedVars = (code.match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || [])
-                    .filter(name => {
-                        return !['int', 'float', 'double', 'char', 'if', 'else', 'while', 'for', 'return', 
-                                'include', 'iostream', 'std', 'cout', 'endl', 'main'].includes(name);
-                    });
-                
-                const declaredVars = declarations.map(d => d.name);
-                const undefinedVars = [...new Set(usedVars)].filter(name => !declaredVars.includes(name));
-                
-                if (undefinedVars.length > 0) {
-                    result += '\nUndefined Variables:\n';
-                    result += '---------------------\n';
-                    undefinedVars.forEach(name => {
-                        if (name !== 'cout' && name !== 'std' && name !== 'endl') {
-                            result += `Warning: Variable '${name}' used but not declared\n`;
-                        }
-                    });
-                }
-                
-                return result;
-            }
-
-            function simulateIntermediateCode(code) {
-                // Simple three-address code generation for demonstration
-                let result = 'Three-Address Code Intermediate Representation:\n\n';
-                
-                // Find variable declarations and assignments
-                const lines = code.split('\n');
-                let tempCounter = 1;
-                
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    
-                    // Skip preprocessor directives, comments, and empty lines
-                    if (line.startsWith('#') || line.startsWith('//') || !line) {
-                        continue;
-                    }
-                    
-                    // Function declarations
-                    if (line.includes('main()') || line.includes('main ()')) {
-                        result += `FUNC_BEGIN main\n`;
-                        continue;
-                    }
-                    
-                    // Return statements
-                    if (line.includes('return')) {
-                        const returnValue = line.replace('return', '').replace(';', '').trim();
-                        result += `RETURN ${returnValue}\n`;
-                        continue;
-                    }
-                    
-                    // Variable declarations with initialization
-                    const declMatch = line.match(/\b(int|float|double|char)\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);/);
-                    if (declMatch) {
-                        const type = declMatch[1];
-                        const name = declMatch[2];
-                        const value = declMatch[3];
-                        
-                        result += `DECLARE ${type} ${name}\n`;
-                        
-                        // Check if value is a complex expression
-                        if (value.includes('+') || value.includes('-') || value.includes('*') || value.includes('/')) {
-                            // Break down complex expression
-                            let operator = '';
-                            if (value.includes('+')) operator = '+';
-                            else if (value.includes('-')) operator = '-';
-                            else if (value.includes('*')) operator = '*';
-                            else if (value.includes('/')) operator = '/';
-                            
-                            const parts = value.split(operator);
-                            const left = parts[0].trim();
-                            const right = parts[1].trim();
-                            
-                            result += `t${tempCounter} = ${left} ${operator} ${right}\n`;
-                            result += `${name} = t${tempCounter}\n`;
-                            tempCounter++;
-                        } else {
-                            result += `${name} = ${value}\n`;
-                        }
-                        continue;
-                    }
-                }
-                
-                result += `FUNC_END main\n`;
-                return result;
-            }
-        });
+        function startProject() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+        }
     </script>
+
+    <script src="script.js"></script>
 </body>
 </html>
-                            let operator = '';
-                            if (value.includes('+')) operator = '+';
-                            else if (value.includes('-')) operator = '-';
-                            else if (value.includes('*')) operator = '*';
-                            else if (value.includes('/')) operator = '/';
-                            
-                            const parts = value.split(operator);
-                            const left = parts[0].trim();
-                            const right = parts[1].trim();
-                            
-                            result += `t${tempCounter} = ${left} ${operator} ${right}\n`;
-                            result += `${name} = t${tempCounter}\n`;
-                            tempCounter++;
-                        } else {
-                            result += `${name} = ${value}\n`;
-                        }
-                        continue;
-                    }
-                    
-                    // Simple variable declarations
-                    const simpleDeclMatch = line.match(/\b(int|float|double|char)\s+([a-zA-Z_][a-zA-Z0-9_]*);/);
-                    if (simpleDeclMatch) {
-                        const type = simpleDeclMatch[1];
-                        const name = simpleDeclMatch[2];
-                        
-                        result += `DECLARE ${type} ${name}\n`;
-                        continue;
-                    }
-                    
-                    // Output statements (cout)
-                    if (line.includes('cout')) {
-                        const outputs = line.split('<<').slice(1).map(part => part.replace(';', '').trim());
-                        
-                        outputs.forEach(output => {
-                            if (output !== 'endl') {
-                                result += `PRINT ${output}\n`;
-                            } else {
-                                result += `PRINT NEWLINE\n`;
-                            }
-                        });
-                        
-                        continue;
-                    }
-              
-                
