@@ -1,163 +1,966 @@
-<!DOCTYPE html>
+
+.<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compiler Design Project</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Style for welcome screen */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --text-color: #1f2937;
+            --light-text: #6b7280;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --accent-color: #c084fc;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Welcome Screen */
         .welcome-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 50px 20px;
-            background: linear-gradient(to right, #dfe9f3, #ffffff);
+            padding: 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+
+        .welcome-content {
+            max-width: 900px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards 0.3s;
         }
 
         .welcome-title {
+            font-family: 'Poppins', sans-serif;
             font-size: 3rem;
-            color: #333;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .welcome-description {
+        .welcome-subtitle {
             font-size: 1.2rem;
-            margin: 20px 0 40px;
-            color: #444;
+            color: var(--light-text);
+            margin-bottom: 2rem;
+            font-weight: 300;
         }
 
-        .phase-cards {
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+
+        /* Compiler Phases Section */
+        .phases-section {
+            padding: 4rem 2rem;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .phases-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .phases-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .phase-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .phase-tab {
+            padding: 1rem 0.5rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: var(--light-text);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .phase-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .phase-tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .phase-tab-icon {
+            font-size: 1.6rem;
+            transition: var(--transition);
+        }
+
+        .phase-tab:hover .phase-tab-icon,
+        .phase-tab.active .phase-tab-icon {
+            transform: translateY(-5px);
+            color: var(--primary-color);
+        }
+
+        .phase-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 350px;
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase-content.active {
+            display: block;
+        }
+
+        .phase-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 12px 0 0 12px;
+        }
+
+        .phase-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .phase-name i {
+            font-size: 1.6rem;
+        }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .phase-description {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .phase-description p {
+            margin-bottom: 1rem;
+        }
+
+        .phase-description ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .phase-description li {
+            margin-bottom: 0.5rem;
+        }
+
+        .code-example {
+            background-color: rgba(79, 70, 229, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .phase-visualization {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .phase-animation {
+            width: 100%;
+            height: 200px;
+            background-color: rgba(79, 70, 229, 0.05);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .animation-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .token-container {
             display: flex;
             flex-wrap: wrap;
+            gap: 0.5rem;
             justify-content: center;
-            gap: 20px;
+            padding: 1rem;
         }
 
-        .phase-card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 250px;
-            text-align: left;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .token {
+            padding: 0.5rem 0.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: popIn 0.3s forwards;
         }
 
-        .phase-card h3 {
-            margin-top: 0;
-            color: #0077cc;
+        .token-type {
+            font-size: 0.7rem;
+            background-color: rgba(255,255,255,0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
         }
 
-        .get-started-btn {
-            margin-top: 40px;
-            padding: 12px 25px;
-            font-size: 1rem;
-            background-color: #0077cc;
+        .ast-node {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .ast-arrow {
+            position: absolute;
+            width: 40px;
+            height: 2px;
+            background-color: var(--primary-color);
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            transform-origin: left center;
+        }
+
+        .ast-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -3px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid var(--primary-color);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+
+        .step-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .step-button {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 50px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .step-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .step-progress {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(79, 70, 229, 0.2);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .step-dot.active {
+            background-color: var(--primary-color);
+            transform: scale(1.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            80% {
+                transform: translateY(-5px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .phase-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .phase-tabs {
+                flex-wrap: wrap;
+            }
+
+            .phase-tab {
+                padding: 0.5rem 0.3rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Explore Button */
+        .explore-container {
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .explore-button {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .explore-button:hover {
+            background-color: #3730a3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+        }
+
+        .explore-button i {
+            transition: var(--transition);
+        }
+
+        .explore-button:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-animation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(79, 70, 229, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .loading-text {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2.2rem;
+            }
+            
+            .phases-title {
+                font-size: 2rem;
+            }
+            
+            .phase-card {
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .phases-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: bounce 2s infinite;
+            opacity: 0.7;
             cursor: pointer;
         }
 
-        .get-started-btn:hover {
-            background-color: #005fa3;
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) translateX(-50%);
+            }
+            40% {
+                transform: translateY(-15px) translateX(-50%);
+            }
+            60% {
+                transform: translateY(-7px) translateX(-50%);
+            }
         }
 
-        /* Hide the main app initially */
-        .main-app {
-            display: none;
+        /* Dark mode toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            width: 45px;
+            height: 45px;
+            background-color: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .theme-toggle i {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-color: #f3f4f6;
+            --light-text: #d1d5db;
+            --primary-color: #818cf8;
+            --secondary-color: #6366f1;
+        }
+
+        body.dark-mode .welcome-screen {
+            background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+        }
+
+        body.dark-mode .phase-card {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Typewriter effect */
+        .typewriter {
+            overflow: hidden;
+            border-right: 0.15em solid var(--primary-color);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: 0.15em;
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary-color) }
         }
     </style>
 </head>
 <body>
-
-    <!-- Welcome Page -->
-    <div class="welcome-screen" id="welcome-screen">
-        <h1 class="welcome-title">Welcome to the Compiler Design Project</h1>
-        <p class="welcome-description">Explore how source code is processed through various phases of a compiler!</p>
-
-        <div class="phase-cards">
-            <div class="phase-card">
-                <h3>1. Lexical Analysis</h3>
-                <p>Breaks input code into tokens like keywords, identifiers, operators, etc.</p>
-            </div>
-            <div class="phase-card">
-                <h3>2. Syntax Analysis</h3>
-                <p>Checks code structure against grammar rules using parse trees.</p>
-            </div>
-            <div class="phase-card">
-                <h3>3. Semantic Analysis</h3>
-                <p>Ensures meaningful logic like type compatibility and declared variables.</p>
-            </div>
-            <div class="phase-card">
-                <h3>4. Intermediate Code</h3>
-                <p>Generates simplified low-level code using temporary variables (TAC).</p>
-            </div>
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-animation">
+            <div class="loader"></div>
+            <p class="loading-text">Loading Compiler...</p>
         </div>
-
-        <button class="get-started-btn" onclick="startProject()">Explore Compiler Phases</button>
     </div>
 
-    <!-- Main Compiler Interface -->
-    <div class="main-app" id="main-app">
-        <header>
-            <h1>Compiler Design Project</h1>
-            <p class="subtitle">Interactive Compiler Phases Demonstration</p>
-        </header>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
 
-        <div class="container">
-            <div class="editor-section">
-                <div class="editor-header">
-                    <h2 class="editor-title">Code Editor</h2>
-                    <div class="file-upload">
-                        <label for="file-input">Upload .cpp</label>
-                        <input type="file" id="file-input" accept=".cpp,.c">
-                        <span class="file-name" id="file-name">No file selected</span>
+    <!-- Welcome Screen -->
+    <section class="welcome-screen" id="welcome">
+        <div class="welcome-content">
+            <div class="logo">
+                <i class="fas fa-code"></i>
+            </div>
+            <h1 class="welcome-title">Welcome to the Compiler Design Project</h1>
+            <p class="welcome-subtitle">An interactive demonstration of the compiler's core phases</p>
+        </div>
+        <div class="scroll-indicator" id="scroll-to-phases">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Compiler Phases Section -->
+    <section class="phases-section" id="phases">
+        <h2 class="phases-title">Understanding Compiler Phases</h2>
+        <div class="phases-container">
+            <div class="phase-tabs">
+                <div class="phase-tab active" data-tab="lexical">
+                    <div class="phase-tab-icon">
+                        <i class="fas fa-font"></i>
+                    </div>
+                    <span>Lexical Analysis</span>
+                </div>
+                <div class="phase-tab" data-tab="syntax">
+                    <div class="phase-tab-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <span>Syntax Analysis</span>
+                </div>
+                <div class="phase-tab" data-tab="semantic">
+                    <div class="phase-tab-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <span>Semantic Analysis</span>
+                </div>
+                <div class="phase-tab" data-tab="intermediate">
+                    <div class="phase-tab-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <span>Intermediate Code</span>
+                </div>
+            </div>
+
+            <!-- Lexical Analysis Content -->
+            <div class="phase-content active" id="lexical-content">
+                <h3 class="phase-name"><i class="fas fa-font"></i> Lexical Analysis</h3>
+                <div class="phase-grid">
+                    <div class="phase-description">
+                        <p>The first phase of compilation that transforms source code into tokens by scanning the input character by character.</p>
+                        <ul>
+                            <li>Reads input characters from source code</li>
+                            <li>Groups them into lexemes</li>
+                            <li>Classifies them into token types (identifiers, keywords, operators, etc.)</li>
+                        </ul>
+                        <p>Example input:</p>
+                        <div class="code-example">int sum = a + b;</div>
+                        <p>Generates tokens:</p>
+                        <div class="code-example">[KEYWORD, "int"]
+[IDENTIFIER, "sum"]
+[OPERATOR, "="]
+[IDENTIFIER, "a"]
+[OPERATOR, "+"]
+[IDENTIFIER, "b"]
+[SYMBOL, ";"]</div>
+                    </div>
+                    <div class="phase-visualization">
+                        <div class="phase-animation" id="lexical-animation">
+                            <div class="animation-container">
+                                <div class="token-container" id="token-container">
+                                    <!-- Tokens will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-controls">
+                            <div class="step-button" id="lexical-prev"><i class="fas fa-chevron-left"></i></div>
+                            <div class="step-button" id="lexical-next"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        <div class="step-progress" id="lexical-progress">
+                            <!-- Step dots will be added dynamically -->
+                        </div>
                     </div>
                 </div>
-                <div class="code-editor">
-                    <div class="line-numbers" id="line-numbers"></div>
-                    <textarea class="code-textarea" id="code-textarea" spellcheck="false" placeholder="// Enter your C/C++ code here..."></textarea>
-                </div>
-                <div class="button-group">
-                    <button class="compiler-button" data-phase="lexical">Lexical Analysis</button>
-                    <button class="compiler-button" data-phase="syntax">Syntax Analysis</button>
-                    <button class="compiler-button" data-phase="semantic">Semantic Analysis</button>
-                    <button class="compiler-button" data-phase="intermediate">Intermediate Code</button>
-                </div>
-                <div class="status-message" id="status-message"></div>
             </div>
 
-            <div class="output-section">
-                <div class="output-header">
-                    <h2 class="output-title">Compiler Output</h2>
-                    <div class="phase-indicator" id="phase-indicator">Ready</div>
+            <!-- Syntax Analysis Content -->
+            <div class="phase-content" id="syntax-content">
+                <h3 class="phase-name"><i class="fas fa-project-diagram"></i> Syntax Analysis</h3>
+                <div class="phase-grid">
+                    <div class="phase-description">
+                        <p>The parser checks if code follows the grammar of the programming language by analyzing token patterns.</p>
+                        <ul>
+                            <li>Takes tokens from lexical analysis</li>
+                            <li>Builds a parse tree or abstract syntax tree (AST)</li>
+                            <li>Reports syntax errors if they exist</li>
+                        </ul>
+                        <p>For the example:</p>
+                        <div class="code-example">int sum = a + b;</div>
+                        <p>The parser constructs an AST:</p>
+                        <div class="code-example">DECLARATION
+  |-- TYPE: int
+  |-- IDENTIFIER: sum
+  |-- ASSIGNMENT
+      |-- IDENTIFIER: a
+      |-- OPERATOR: +
+      |-- IDENTIFIER: b</div>
+                    </div>
+                    <div class="phase-visualization">
+                        <div class="phase-animation" id="syntax-animation">
+                            <div class="animation-container" id="ast-container">
+                                <!-- AST nodes will be added dynamically -->
+                            </div>
+                        </div>
+                        <div class="step-controls">
+                            <div class="step-button" id="syntax-prev"><i class="fas fa-chevron-left"></i></div>
+                            <div class="step-button" id="syntax-next"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        <div class="step-progress" id="syntax-progress">
+                            <!-- Step dots will be added dynamically -->
+                        </div>
+                    </div>
                 </div>
-                <div class="loader" id="loader"></div>
-                <div class="output-content" id="output-content">Output will appear here after analysis...</div>
+            </div>
+
+            <!-- Semantic Analysis Content -->
+            <div class="phase-content" id="semantic-content">
+                <h3 class="phase-name"><i class="fas fa-search"></i> Semantic Analysis</h3>
+                <div class="phase-grid">
+                    <div class="phase-description">
+                        <p>This phase checks the logical meaning of code by verifying type consistency and scope rules.</p>
+                        <ul>
+                            <li>Verifies type compatibility</li>
+                            <li>Checks variable declarations and scopes</li>
+                            <li>Ensures operands match operators</li>
+                            <li>Builds symbol tables</li>
+                        </ul>
+                        <p>Example checks:</p>
+                        <div class="code-example">int sum = a + b;</div>
+                        <p>Semantic analyzer ensures:</p>
+                        <ul>
+                            <li>'a' and 'b' are declared variables</li>
+                            <li>They are compatible with the '+' operator</li>
+                            <li>The result can be assigned to 'sum'</li>
+                            <li>Type checking ensures all operations are valid</li>
+                        </ul>
+                    </div>
+                    <div class="phase-visualization">
+                        <div class="phase-animation" id="semantic-animation">
+                            <div class="animation-container">
+                                <!-- Semantic animation content -->
+                                <div id="symbol-table" class="symbol-table">
+                                    <!-- Symbol table will be added dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-controls">
+                            <div class="step-button" id="semantic-prev"><i class="fas fa-chevron-left"></i></div>
+                            <div class="step-button" id="semantic-next"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        <div class="step-progress" id="semantic-progress">
+                            <!-- Step dots will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intermediate Code Content -->
+            <div class="phase-content" id="intermediate-content">
+                <h3 class="phase-name"><i class="fas fa-code"></i> Intermediate Code Generation</h3>
+                <div class="phase-grid">
+                    <div class="phase-description">
+                        <p>Creates a machine-independent representation that bridges high-level source code and target machine code.</p>
+                        <ul>
+                            <li>Translates the AST into three-address code (3AC)</li>
+                            <li>Breaks complex operations into simpler ones</li>
+                            <li>Prepares for optimization steps</li>
+                        </ul>
+                        <p>For the example:</p>
+                        <div class="code-example">int sum = a + b;</div>
+                        <p>Intermediate code (3AC) might look like:</p>
+                        <div class="code-example">t1 = a + b
+sum = t1</div>
+                        <p>This simplified form makes optimizations easier and provides a step toward target code generation.</p>
+                    </div>
+                    <div class="phase-visualization">
+                        <div class="phase-animation" id="intermediate-animation">
+                            <div class="animation-container">
+                                <!-- 3AC animation content -->
+                                <div id="three-address-code" class="three-address-code">
+                                    <!-- 3AC will be added dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-controls">
+                            <div class="step-button" id="intermediate-prev"><i class="fas fa-chevron-left"></i></div>
+                            <div class="step-button" id="intermediate-next"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        <div class="step-progress" id="intermediate-progress">
+                            <!-- Step dots will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Modal for output -->
-        <div id="output-modal" class="modal">
-            <div class="modal-content">
-                <span class="close" id="close-modal">&times;</span>
-                <h2 class="modal-title" id="modal-title">Output</h2>
-                <div class="modal-output" id="modal-output"></div>
-            </div>
-        </div>
+        <div class="explore-container">
+    <a href="phases.html" class="explore-button" id="explore-button">
+        Explore the Compiler <i class="fas fa-arrow-right"></i>
+    </a>
+</div>
 
-        <footer>
-            <p>&copy; 2025 Compiler Design Project</p>
-        </footer>
-    </div>
+    </section>
 
-    <!-- JS to toggle welcome -> compiler app -->
     <script>
-        function startProject() {
-            document.getElementById('welcome-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-        }
-    </script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Loading animation
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                loadingOverlay.style.opacity = 0;
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 1500);
 
-    <script src="script.js"></script>
-</body>
-</html>
+            // Scroll to phases
+            document.getElementById('scroll-to-phases').addEventListener('click', function() {
+                document.getElementById('phases').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Phase card flip
+            const phaseCards = document.querySelectorAll('.phase-card');
+            phaseCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('flipped');
+                });
+
+                const closeBtn = card.querySelector('.close-card');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();        // It prevents the event from bubbling up the DOM tree. That means it stops the event from triggering parent element event listeners.
+                        card.classList.remove('flipped');
+                    });
+                }
+            });
+
+            // Explore button
+            document.getElementById('explore-button').addEventListener('click', function() {
+                // Transition to the main compiler interface
+                document.getElementById('welcome').style.display = 'none';
+                document.getElementById('phases').style.display = 'none';
+                
+                // Show loading
+                const loadingOverlay = document.getElementById('loading-overlay');
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.style.opacity = 1;
+                
+                // Simulate loading for transition effect
+                setTimeout(() => {
+                    window.location.href = 'phases.html';
+                }, 1000);
+            });
+
+            // Dark mode toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                
+                // Update icon
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            });
+            // Phase tab switching
+            const tabs = document.querySelectorAll('.phase-tab');
+            const contents = document.querySelectorAll('.phase-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+
+                    // Show corresponding content
+                    const targetId = tab.getAttribute('data-tab') + '-content';
+                    const targetContent = document.getElementById(targetId);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+
+        });
+            </script>
+    </body>
+    
+    </html>

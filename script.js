@@ -100,7 +100,7 @@ int main() {
         statusMessage.textContent = '';
         loader.style.display = 'block';
 
-        // Update phase indicator
+        // Update phase indicator on RHS
         let phaseText = '';
         switch (phase) {
             case 'lexical':
@@ -129,10 +129,6 @@ int main() {
                     modalTitle.textContent = phaseText + ' Output';
                     modalOutput.textContent = result;
 
-
-                    if (phase === 'intermediate') {
-                        modal.style.display = 'block';
-                    }
                 })
                 .catch(error => {
                     loader.style.display = 'none';
@@ -179,7 +175,7 @@ int main() {
     'inline', 'int', 'long', 'register', 'return', 'short', 'signed', 'sizeof',
     'static', 'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile',
     'while'
-]);
+    ]);
 
 
     const operators = new Set([
@@ -232,24 +228,20 @@ int main() {
 }
 
 
-
-    function simulateSyntaxAnalysis(code) {
+function simulateSyntaxAnalysis(code) {
   const lines = code.split('\n');
 
   let result = 'Syntax Analysis Results:\n\nParse Tree:\n';
 
-  // Helper functions to identify line types
   function isPreprocessor(line) {
     return line.trim().startsWith('#');
   }
 
   function isFunctionDef(line) {
-    // Rough match for function header: [return_type] [name](params) {
     return /^\s*(int|void|float|double|char)\s+[a-zA-Z_]\w*\s*\([^)]*\)\s*\{?/.test(line);
   }
 
   function getFunctionHeaderParts(line) {
-    // Extract return type, name, params from function def line
     const funcMatch = line.match(/^\s*(int|void|float|double|char)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)/);
     if (!funcMatch) return null;
     return {
@@ -264,29 +256,32 @@ int main() {
   }
 
   function getVarDeclarations(line) {
-    // Extract all variable declarations from a line like "int a, b = 5, c;"
     const typeMatch = line.match(/^\s*(int|float|double|char)\s+(.*);/);
     if (!typeMatch) return [];
     const type = typeMatch[1];
     const declPart = typeMatch[2];
-
-    // Split by commas not inside parentheses (simple split by ',')
     const parts = declPart.split(',');
-
     return parts.map(part => {
       const p = part.trim();
       const eqIdx = p.indexOf('=');
       if (eqIdx !== -1) {
         const name = p.slice(0, eqIdx).trim();
         const value = p.slice(eqIdx + 1).trim();
-        return {type, name, value};
+        return { type, name, value };
       } else {
-        return {type, name: p, value: undefined};
+        return { type, name: p, value: undefined };
       }
     });
   }
 
-  // State for tracking functions and blocks
+  function isStatementNeedingSemicolon(line) {
+    return (
+      isVarDecl(line) ||
+      line.startsWith('return') ||
+      (line.includes('=') && !line.includes('==') && !line.startsWith('if') && !line.startsWith('while'))
+    );
+  }
+
   let insideFunction = false;
   let currentFunction = null;
   let braceStack = [];
@@ -294,7 +289,7 @@ int main() {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i].trim();
 
-    if (!line) continue; // skip empty lines
+    if (!line) continue;
 
     if (isPreprocessor(line)) {
       result += `  |- Preprocessor Directive: ${line}\n`;
@@ -328,8 +323,13 @@ int main() {
       if (line.includes('{')) {
         braceStack.push('{');
       }
+
       if (line.includes('}')) {
-        braceStack.pop();
+        if (braceStack.length === 0) {
+          result += `  |- ❌ Error: Unmatched closing brace at line ${i + 1}: "${line}"\n`;
+        } else {
+          braceStack.pop();
+        }
         if (braceStack.length === 0) {
           insideFunction = false;
           currentFunction = null;
@@ -338,7 +338,10 @@ int main() {
       }
 
       if (isVarDecl(line)) {
-        const decls = getVarDeclarations(line);
+        if (!line.endsWith(';')) {
+          result += `          |- ❌ Error: Missing semicolon at end of statement: "${line}"\n`;
+        }
+        const decls = getVarDeclarations(line + (line.endsWith(';') ? '' : ';')); // artificially add ; to parse properly
         for (const decl of decls) {
           if (decl.value !== undefined) {
             result += `          |- Variable Declaration: ${decl.type} ${decl.name} = ${decl.value}\n`;
@@ -347,22 +350,35 @@ int main() {
           }
         }
       } else if (line.startsWith('return')) {
+        if (!line.endsWith(';')) {
+          result += `          |- ❌ Error: Missing semicolon at end of return statement: "${line}"\n`;
+        }
         result += `          |- Return Statement: ${line}\n`;
       } else if (line.includes('=')) {
+        if (!line.endsWith(';')) {
+          result += `          |-  Error: Missing semicolon at end of expression: "${line}"\n`;
+        }
         result += `          |- Expression Statement: ${line}\n`;
       } else {
-        // Other statement types
         result += `          |- Statement: ${line}\n`;
       }
     } else {
-      // Outside functions - global scope or unknown
-      result += `  |- Statement: ${line}\n`;
+      if (line.includes('}')) {
+        result += `  |- Error: Unmatched closing brace at line ${i + 1}: "${line}"\n`;
+      } else {
+        result += `  |- Statement: ${line}\n`;
+      }
     }
+  }
+
+  if (braceStack.length > 0) {
+    result += ` Error: Missing closing brace(s) for function block(s).\n`;
   }
 
   result += 'Syntax analysis completed successfully.\n';
   return result;
 }
+
 
 function simulateSemanticAnalysis(code) {
     let result = 'Semantic Analysis Results:\n\n';

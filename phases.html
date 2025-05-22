@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiler Design Project</title>
+    <link rel="stylesheet" href="style.css">
+    
+
+    <!-- Main Compiler Interface -->
+    <div class="main-app" id="main-app">
+        <header>
+            <h1>Compiler Design Project</h1>
+            <p class="subtitle">Interactive Compiler Phases Demonstration</p>
+        </header>
+
+        <div class="container">
+            <div class="editor-section">
+                <div class="editor-header">
+                    <h2 class="editor-title">Code Editor</h2>
+                    <div class="file-upload">
+                        <label for="file-input">Upload .cpp</label>
+                        <input type="file" id="file-input" accept=".cpp,.c">
+                        <span class="file-name" id="file-name">No file selected</span>
+                    </div>
+                </div>
+                <div class="code-editor">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <textarea class="code-textarea" id="code-textarea" spellcheck="false" placeholder="// Enter your C/C++ code here..."></textarea>
+                </div>
+                <div class="button-group">
+                    <button class="compiler-button" data-phase="lexical">Lexical Analysis</button>
+                    <button class="compiler-button" data-phase="syntax">Syntax Analysis</button>
+                    <button class="compiler-button" data-phase="semantic">Semantic Analysis</button>
+                    <button class="compiler-button" data-phase="intermediate">Intermediate Code</button>
+                </div>
+                <div class="status-message" id="status-message"></div>
+            </div>
+
+            <div class="output-section">
+                <div class="output-header">
+                    <h2 class="output-title">Compiler Output</h2>
+                    <div class="phase-indicator" id="phase-indicator">Ready</div>
+                </div>
+                <div class="loader" id="loader"></div>
+                <div class="output-content" id="output-content">Output will appear here after analysis...</div>
+            </div>
+        </div>
+
+        <!-- Modal for output -->
+        <div id="output-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="close-modal">&times;</span>
+                <h2 class="modal-title" id="modal-title">Output</h2>
+                <div class="modal-output" id="modal-output"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Compiler Design Project</p>
+        </footer>
+    </div>
+
+    <!-- JS to toggle welcome -> compiler app -->
+    
+
+    <script src="script.js"></script>
+</body>
+</html>
