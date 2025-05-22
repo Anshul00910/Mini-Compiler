@@ -41,9 +41,8 @@ The project is divided into two main parts:
 - Visual output for each compiler phase
 - Real-time feedback and error reporting
 - Great for students learning compiler design
-- Lightweight and runs entirely in the browser (no backend)
+- Lightweight and runs entirely in the browser 
 
----
 ---
 
 ## 🙌 Final Note
