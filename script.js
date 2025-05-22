@@ -326,7 +326,7 @@ function simulateSyntaxAnalysis(code) {
 
       if (line.includes('}')) {
         if (braceStack.length === 0) {
-          result += `  |- ❌ Error: Unmatched closing brace at line ${i + 1}: "${line}"\n`;
+          result += `  |-  Error: Unmatched closing brace at line ${i + 1}: "${line}"\n`;
         } else {
           braceStack.pop();
         }
@@ -339,7 +339,7 @@ function simulateSyntaxAnalysis(code) {
 
       if (isVarDecl(line)) {
         if (!line.endsWith(';')) {
-          result += `          |- ❌ Error: Missing semicolon at end of statement: "${line}"\n`;
+          result += `          |-  Error: Missing semicolon at end of statement: "${line}"\n`;
         }
         const decls = getVarDeclarations(line + (line.endsWith(';') ? '' : ';')); // artificially add ; to parse properly
         for (const decl of decls) {
@@ -351,7 +351,7 @@ function simulateSyntaxAnalysis(code) {
         }
       } else if (line.startsWith('return')) {
         if (!line.endsWith(';')) {
-          result += `          |- ❌ Error: Missing semicolon at end of return statement: "${line}"\n`;
+          result += `          |-  Error: Missing semicolon at end of return statement: "${line}"\n`;
         }
         result += `          |- Return Statement: ${line}\n`;
       } else if (line.includes('=')) {
@@ -527,19 +527,74 @@ function simulateIntermediateCode(code) {
     const lines = code.split('\n');
     let tempCounter = 1;
 
+    // Recursive expression processor with operator precedence
     function processExpression(expr) {
         expr = expr.trim();
-        let operatorMatch = expr.match(/(.+)([+\-*/])(.+)/);
-        if (operatorMatch) {
-            const left = operatorMatch[1].trim();
-            const op = operatorMatch[2];
-            const right = operatorMatch[3].trim();
-            const tempVar = `t${tempCounter++}`;
-            const codeLine = `${tempVar} = ${left} ${op} ${right}`;
-            return { code: codeLine, temp: tempVar };
-        } else {
-            return { value: expr }; // not an expression
+
+        // If expression is just a variable or number
+        if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(expr) || /^[0-9]+(\.[0-9]+)?$/.test(expr)) {
+            return { value: expr };
         }
+
+        // Remove surrounding parentheses if any
+        while (expr.startsWith('(') && expr.endsWith(')')) {
+            // Check balanced parentheses inside
+            let depth = 0, balanced = true;
+            for (let i = 0; i < expr.length; i++) {
+                if (expr[i] === '(') depth++;
+                else if (expr[i] === ')') depth--;
+                if (depth === 0 && i < expr.length - 1) {
+                    balanced = false;
+                    break;
+                }
+            }
+            if (balanced) {
+                expr = expr.slice(1, -1).trim();
+            } else {
+                break;
+            }
+        }
+
+        // Operators by precedence (lowest to highest)
+        const operatorsByPrecedence = [
+            ['+', '-'],
+            ['*', '/']
+        ];
+
+        for (let ops of operatorsByPrecedence) {
+            let parts = splitAtOperatorOutsideParentheses(expr, ops);
+            if (parts) {
+                const leftExpr = processExpression(parts.left);
+                const rightExpr = processExpression(parts.right);
+                const tempVar = `t${tempCounter++}`;
+                let codeLines = [];
+                if (leftExpr.code) codeLines.push(leftExpr.code);
+                if (rightExpr.code) codeLines.push(rightExpr.code);
+                codeLines.push(`${tempVar} = ${leftExpr.temp || leftExpr.value} ${parts.operator} ${rightExpr.temp || rightExpr.value}`);
+                return { code: codeLines.join('\n'), temp: tempVar };
+            }
+        }
+
+        // If no operator found (just return as is)
+        return { value: expr };
+    }
+
+    // Helper to split expression at the last occurrence of any of the operators outside parentheses
+    function splitAtOperatorOutsideParentheses(expr, ops) {
+        let depth = 0;
+        for (let i = expr.length - 1; i >= 0; i--) {
+            let ch = expr[i];
+            if (ch === ')') depth++;
+            else if (ch === '(') depth--;
+            else if (depth === 0 && ops.includes(ch)) {
+                return {
+                    left: expr.substring(0, i),
+                    right: expr.substring(i + 1),
+                    operator: ch
+                };
+            }
+        }
+        return null;
     }
 
     for (let i = 0; i < lines.length; i++) {
@@ -554,7 +609,13 @@ function simulateIntermediateCode(code) {
 
         if (line.includes('return')) {
             const returnValue = line.replace('return', '').replace(';', '').trim();
-            result += `RETURN ${returnValue}\n`;
+            const expr = processExpression(returnValue);
+            if (expr.temp) {
+                result += `${expr.code}\n`;
+                result += `RETURN ${expr.temp}\n`;
+            } else {
+                result += `RETURN ${expr.value}\n`;
+            }
             continue;
         }
 
@@ -577,12 +638,27 @@ function simulateIntermediateCode(code) {
             continue;
         }
 
-        // Simple variable declaration
+        // Simple variable declaration without initialization
         const simpleDeclMatch = line.match(/\b(int|float|double|char)\s+([a-zA-Z_][a-zA-Z0-9_]*);/);
         if (simpleDeclMatch) {
             const type = simpleDeclMatch[1];
             const name = simpleDeclMatch[2];
             result += `DECLARE ${type} ${name}\n`;
+            continue;
+        }
+
+        // Assignment without declaration
+        const assignMatch = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);$/);
+        if (assignMatch) {
+            const name = assignMatch[1];
+            const value = assignMatch[2].trim();
+            const expr = processExpression(value);
+            if (expr.temp) {
+                result += `${expr.code}\n`;
+                result += `${name} = ${expr.temp}\n`;
+            } else {
+                result += `${name} = ${expr.value}\n`;
+            }
             continue;
         }
 
